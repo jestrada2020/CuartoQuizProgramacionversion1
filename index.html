@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación de Pandas: DataFrame, Índice y Operaciones</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #34495e; /* Gris azulado oscuro */
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f6f7; /* Gris muy claro */
+        }
+
+        h1, h2, h3 {
+            color: #2c3e50; /* Azul pizarra */
+        }
+
+        h1 {
+            border-bottom: 2px solid #3498db; /* Azul estándar */
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            color: #2980b9; /* Azul más oscuro */
+            margin-top: 30px;
+        }
+
+        .student-info {
+            background-color: #ecf0f1; /* Gris claro */
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .student-info input {
+            border: 1px solid #bdc3c7; /* Gris medio */
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .instructions {
+            background-color: #eaf2f8; /* Azul muy claro */
+            padding: 15px;
+            border-left: 4px solid #5dade2; /* Azul claro */
+            margin-bottom: 20px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .question {
+            background-color: white;
+            border: 1px solid #d5dbdb; /* Gris claro */
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08); /* Sombra suave */
+        }
+
+        .question-title {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 18px;
+        }
+
+        .points {
+            background-color: #3498db; /* Azul estándar */
+            color: white;
+            padding: 3px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        .question-description {
+            margin-bottom: 15px;
+            color: #566573; /* Gris oscuro */
+            padding: 10px;
+            background-color: #f8f9f9; /* Gris muy claro */
+            border-radius: 4px;
+        }
+
+        .code-container {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 15px;
+            position: relative;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .code-placeholder {
+            background-color: #fff9c4; /* Amarillo muy pálido */
+            border: 1px dashed #fbc02d; /* Amarillo */
+            border-radius: 3px;
+            padding: 0 5px;
+            color: #333;
+            font-weight: normal;
+            display: inline-block;
+            min-width: 20px;
+        }
+
+        .code-placeholder.correct {
+            background-color: #c8e6c9; /* Verde muy pálido */
+            border: 1px solid #66bb6a; /* Verde */
+            color: #2e7d32;
+        }
+
+        .code-placeholder.incorrect {
+            background-color: #ffcdd2; /* Rojo muy pálido */
+            border: 1px solid #ef5350; /* Rojo */
+            color: #c62828;
+        }
+
+        .code-comment {
+            color: #5499c7; /* Azul */
+            font-style: italic;
+        }
+
+        button {
+            background-color: #3498db; /* Azul estándar */
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        button:hover {
+            background-color: #2980b9; /* Azul más oscuro */
+        }
+
+        .feedback-btn {
+            background-color: #85c1e9; /* Azul claro */
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-top: 10px;
+            display: inline-block;
+            margin-left: 0;
+            margin-right: 10px;
+        }
+
+        .feedback-btn:hover {
+            background-color: #5dade2;
+        }
+
+        .results {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f5e9; /* Verde muy pálido */
+            border-left: 4px solid #4caf50; /* Verde */
+            border-radius: 0 5px 5px 0;
+            display: none;
+        }
+
+        .score-display {
+            font-size: 24px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            padding: 15px;
+            background-color: #4caf50; /* Verde */
+            color: white;
+            border-radius: 5px;
+        }
+
+        .question-result {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .correct {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .incorrect {
+            color: #c62828;
+        }
+
+        .feedback-area {
+            margin-top: 10px;
+            padding: 5px;
+            border-radius: 3px;
+            min-height: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #4caf50; /* Verde */
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.5s;
+            text-align: center;
+            color: white;
+            line-height: 20px;
+        }
+         /* Estilo para el ejemplo de DataFrame */
+        .dataframe-example {
+             background-color: #f8f9f9;
+             border: 1px solid #d6dbdf;
+             padding: 8px;
+             margin-bottom: 10px;
+             font-family: monospace;
+             white-space: pre;
+             font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Evaluación Interactiva de Python</h1>
+    <h2 style="text-align: center;">Pandas: DataFrame, Índice y Operaciones Básicas (50 puntos)</h2>
+
+    <div class="student-info">
+        <div>
+            <label for="nombre"><strong>Nombre Completo:</strong></label>
+            <input type="text" id="nombre" placeholder="Ingrese su nombre completo">
+        </div>
+        <div>
+            <label for="apellidos"><strong>Apellidos Completos:</strong></label>
+            <input type="text" id="apellidos" placeholder="Ingrese sus apellidos">
+        </div>
+    </div>
+
+    <div class="instructions">
+        <h3>Instrucciones Generales</h3>
+        <ul>
+            <li>Completa los <strong>espacios en blanco</strong> en cada fragmento de código Python.</li>
+            <li>Los espacios están marcados con <span class="code-placeholder">[...]</span>.</li>
+            <li>Los comentarios <span class="code-comment"># Rellena:</span> te dan pistas sobre qué escribir. Usa el alias `pd` para Pandas.</li>
+            <li>Esta evaluación se centra en: la estructura del DataFrame, el Índice (su rol y uso), y operaciones básicas (matemáticas, estadísticas, graficación).</li>
+            <li>Haz clic en <strong>"Verificar Respuesta"</strong> en cada pregunta para obtener retroalimentación.</li>
+            <li>Al final, haz clic en <strong>"Calcular Nota Final"</strong>.</li>
+            <li>Presta atención a la <strong>sintaxis exacta</strong>.</li>
+        </ul>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progress-bar">0%</div>
+    </div>
+
+    <h2>Sección de Preguntas (Total: 50 Puntos)</h2>
+
+    <div id="questions-container">
+
+        <h3 style="color: #2980b9; margin-top:40px;">Fundamentos del DataFrame</h3>
+
+        <div class="question" id="q1">
+            <div class="question-title">1. Importar Pandas <span class="points">2 Puntos</span></div>
+            <div class="question-description">Importa la librería Pandas con su alias estándar `pd`.</div>
+            <div class="code-container">
+                <pre><span class="code-placeholder" id="q1-part1" contenteditable="true">[...]</span> pandas <span class="code-placeholder" id="q1-part2" contenteditable="true">[...]</span> pd <span class="code-comment"># Rellena: Comando para importar pandas como pd</span>
+print("Pandas importado")</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(1)">Verificar Respuesta</button>
+            <div id="q1-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q2">
+            <div class="question-title">2. Crear una Serie <span class="points">2 Puntos</span></div>
+            <div class="question-description">Crea una Serie de Pandas, que representa una columna de datos con un índice.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+datos_lista = [10, 20, 30]
+mi_serie = pd.<span class="code-placeholder" id="q2-part1" contenteditable="true">[...]</span>(datos_lista) <span class="code-comment"># Rellena: Función para crear una Serie</span>
+print(mi_serie)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(2)">Verificar Respuesta</button>
+            <div id="q2-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q3">
+            <div class="question-title">3. Crear un DataFrame <span class="points">2 Puntos</span></div>
+            <div class="question-description">Crea la estructura fundamental de Pandas, un DataFrame (tabla), a partir de un diccionario.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+datos_dict = {'ColumnaA': [1, 2, 3], 'ColumnaB': ['X', 'Y', 'Z']}
+mi_df = pd.<span class="code-placeholder" id="q3-part1" contenteditable="true">[...]</span>(datos_dict) <span class="code-comment"># Rellena: Función para crear un DataFrame</span>
+print(mi_df)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(3)">Verificar Respuesta</button>
+            <div id="q3-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q4">
+            <div class="question-title">4. Dimensiones del DataFrame <span class="points">2 Puntos</span></div>
+            <div class="question-description">Obtén las dimensiones (número de filas y columnas) del DataFrame `df`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'A': [1, 2], 'B': [3, 4], 'C': [5, 6]}
+df = pd.DataFrame(data)
+dimensiones = df.<span class="code-placeholder" id="q4-part1" contenteditable="true">[...]</span> <span class="code-comment"># Rellena: Atributo para obtener la forma (filas, columnas)</span>
+print(dimensiones) # Debería mostrar (2, 3)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(4)">Verificar Respuesta</button>
+            <div id="q4-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q5">
+            <div class="question-title">5. Nombres de las columnas <span class="points">2 Puntos</span></div>
+            <div class="question-description">Obtén una lista (o un objeto Index) con los nombres de las columnas del DataFrame `df`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Nombre': ['Ana', 'Luis'], 'Edad': [25, 30]}
+df = pd.DataFrame(data)
+nombres_columnas = df.<span class="code-placeholder" id="q5-part1" contenteditable="true">[...]</span> <span class="code-comment"># Rellena: Atributo para obtener los nombres de columna</span>
+print(nombres_columnas)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(5)">Verificar Respuesta</button>
+            <div id="q5-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q6">
+            <div class="question-title">6. Tipos de datos por columna <span class="points">2 Puntos</span></div>
+            <div class="question-description">Obtén los tipos de datos (dtypes) de cada columna en el DataFrame `df`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Enteros': [1, 2], 'Flotantes': [1.1, 2.2], 'Texto': ['a', 'b']}
+df = pd.DataFrame(data)
+tipos_datos = df.<span class="code-placeholder" id="q6-part1" contenteditable="true">[...]</span> <span class="code-comment"># Rellena: Atributo para obtener los tipos de datos</span>
+print(tipos_datos)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(6)">Verificar Respuesta</button>
+            <div id="q6-feedback" class="feedback-area"></div>
+        </div>
+
+        <h3 style="color: #2980b9; margin-top:40px;">El Índice y su Uso</h3>
+
+        <div class="question" id="q7">
+            <div class="question-title">7. Acceder al Índice <span class="points">2 Puntos</span></div>
+            <div class="question-description">Obtén el índice (las etiquetas de las filas) del DataFrame `df`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'A': [10, 20, 30]}
+df = pd.DataFrame(data, index=['x', 'y', 'z'])
+indice_df = df.<span class="code-placeholder" id="q7-part1" contenteditable="true">[...]</span> <span class="code-comment"># Rellena: Atributo para acceder al índice</span>
+print(indice_df)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(7)">Verificar Respuesta</button>
+            <div id="q7-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q8">
+            <div class="question-title">8. Establecer Columna como Índice <span class="points">2 Puntos</span></div>
+            <div class="question-description">Usa la columna 'ID' como el nuevo índice del DataFrame `df`. (Crea un nuevo DataFrame o modifica inplace).</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'ID': [101, 102], 'Valor': [50, 60]}
+df = pd.DataFrame(data)
+df_con_indice = df.<span class="code-placeholder" id="q8-part1" contenteditable="true">[...]</span>('ID') <span class="code-comment"># Rellena: Método para establecer una columna como índice</span>
+print(df_con_indice)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(8)">Verificar Respuesta</button>
+            <div id="q8-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q9">
+            <div class="question-title">9. Resetear el Índice <span class="points">2 Puntos</span></div>
+            <div class="question-description">Convierte el índice actual del DataFrame `df_con_indice` de nuevo en una columna regular, restableciendo el índice numérico por defecto.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Valor': [50, 60]}
+df_con_indice = pd.DataFrame(data, index=pd.Index([101, 102], name='ID')) # DF con índice 'ID'
+df_reseteado = df_con_indice.<span class="code-placeholder" id="q9-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para resetear el índice</span>
+print(df_reseteado)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(9)">Verificar Respuesta</button>
+            <div id="q9-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q10">
+            <div class="question-title">10. Selección por Etiqueta de Índice (.loc) <span class="points">2 Puntos</span></div>
+            <div class="question-description">Selecciona la fila cuya etiqueta de índice es 'y' usando el accesor `.loc`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'A': [10, 20, 30]}
+df = pd.DataFrame(data, index=['x', 'y', 'z'])
+fila_y = df.<span class="code-placeholder" id="q10-part1" contenteditable="true">[...]</span>['y'] <span class="code-comment"># Rellena: Selección basada en etiqueta con .loc</span>
+print(fila_y)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(10)">Verificar Respuesta</button>
+            <div id="q10-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q11">
+            <div class="question-title">11. Selección por Posición de Índice (.iloc) <span class="points">2 Puntos</span></div>
+            <div class="question-description">Selecciona la *primera* fila (posición 0) del DataFrame usando el accesor `.iloc`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'A': [10, 20, 30]}
+df = pd.DataFrame(data, index=['x', 'y', 'z'])
+primera_fila = df.<span class="code-placeholder" id="q11-part1" contenteditable="true">[...]</span>[0] <span class="code-comment"># Rellena: Selección basada en posición con .iloc</span>
+print(primera_fila)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(11)">Verificar Respuesta</button>
+            <div id="q11-feedback" class="feedback-area"></div>
+        </div>
+
+         <div class="question" id="q12">
+            <div class="question-title">12. Reindexar DataFrame <span class="points">2 Puntos</span></div>
+            <div class="question-description">Crea un nuevo DataFrame `df_reindexado` conformando `df` a un nuevo índice `['w', 'x', 'y']`. Rellena los valores faltantes con 0.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'A': [10, 20]}
+df = pd.DataFrame(data, index=['x', 'y'])
+nuevo_indice = ['w', 'x', 'y']
+df_reindexado = df.<span class="code-placeholder" id="q12-part1" contenteditable="true">[...]</span>(nuevo_indice, fill_value=0) <span class="code-comment"># Rellena: Método para reindexar</span>
+print(df_reindexado)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(12)">Verificar Respuesta</button>
+            <div id="q12-feedback" class="feedback-area"></div>
+        </div>
+
+        <h3 style="color: #2980b9; margin-top:40px;">Operaciones Matemáticas y Estadísticas</h3>
+
+        <div class="question" id="q13">
+            <div class="question-title">13. Seleccionar una Columna (Serie) <span class="points">2 Puntos</span></div>
+            <div class="question-description">Selecciona la columna 'Precio' del DataFrame `df` como un objeto Serie.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Producto': ['A', 'B'], 'Precio': [100, 150]}
+df = pd.DataFrame(data)
+serie_precio = df<span class="code-placeholder" id="q13-part1" contenteditable="true">[...]</span> <span class="code-comment"># Rellena: Selección de la columna 'Precio'</span>
+print(type(serie_precio)) # Debería mostrar <class 'pandas.core.series.Series'></pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(13)">Verificar Respuesta</button>
+            <div id="q13-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q14">
+            <div class="question-title">14. Operación Matemática en Columna <span class="points">2 Puntos</span></div>
+            <div class="question-description">Crea una nueva columna 'PrecioConIVA' calculando el 19% de IVA sobre la columna 'Precio'. (IVA = Precio * 0.19)</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Producto': ['A', 'B'], 'Precio': [100, 200]}
+df = pd.DataFrame(data)
+df['PrecioConIVA'] = df['Precio'] + (df['Precio'] <span class="code-placeholder" id="q14-part1" contenteditable="true">[...]</span> 0.19) <span class="code-comment"># Rellena: Operador de multiplicación</span>
+print(df)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(14)">Verificar Respuesta</button>
+            <div id="q14-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q15">
+            <div class="question-title">15. Suma de una Columna <span class="points">2 Puntos</span></div>
+            <div class="question-description">Calcula la suma total de todos los valores en la columna 'Cantidad'.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Producto': ['A', 'B', 'C'], 'Cantidad': [10, 5, 8]}
+df = pd.DataFrame(data)
+total_cantidad = df['Cantidad'].<span class="code-placeholder" id="q15-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para calcular la suma</span>
+print(total_cantidad) # Debería ser 23</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(15)">Verificar Respuesta</button>
+            <div id="q15-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q16">
+            <div class="question-title">16. Media de una Columna <span class="points">2 Puntos</span></div>
+            <div class="question-description">Calcula el valor promedio (media) de la columna 'Puntuacion'.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Examen': [1, 2, 3], 'Puntuacion': [80, 90, 70]}
+df = pd.DataFrame(data)
+media_puntuacion = df['Puntuacion'].<span class="code-placeholder" id="q16-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para calcular la media</span>
+print(media_puntuacion) # Debería ser 80.0</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(16)">Verificar Respuesta</button>
+            <div id="q16-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q17">
+            <div class="question-title">17. Valor Máximo en Columna <span class="points">2 Puntos</span></div>
+            <div class="question-description">Encuentra el valor máximo en la columna 'Temperatura'.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Dia': [1, 2, 3], 'Temperatura': [25, 28, 22]}
+df = pd.DataFrame(data)
+max_temp = df['Temperatura'].<span class="code-placeholder" id="q17-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para encontrar el máximo</span>
+print(max_temp) # Debería ser 28</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(17)">Verificar Respuesta</button>
+            <div id="q17-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q18">
+            <div class="question-title">18. Estadísticas Descriptivas <span class="points">2 Puntos</span></div>
+            <div class="question-description">Genera un resumen de estadísticas descriptivas (conteo, media, std, min, max, etc.) para las columnas numéricas del DataFrame `df`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'A': [1, 2, 3, 4, 5], 'B': [10, 20, 30, 40, 50]}
+df = pd.DataFrame(data)
+estadisticas = df.<span class="code-placeholder" id="q18-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para obtener estadísticas descriptivas</span>
+print(estadisticas)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(18)">Verificar Respuesta</button>
+            <div id="q18-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q19">
+            <div class="question-title">19. Aplicar una Función <span class="points">2 Puntos</span></div>
+            <div class="question-description">Usa el método `.apply()` para aplicar una función lambda que duplique cada valor de la columna 'Valor'.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Valor': [10, 20, 30]}
+df = pd.DataFrame(data)
+df['ValorDuplicado'] = df['Valor'].<span class="code-placeholder" id="q19-part1" contenteditable="true">[...]</span>(lambda x: x * 2) <span class="code-comment"># Rellena: Método para aplicar una función</span>
+print(df)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(19)">Verificar Respuesta</button>
+            <div id="q19-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q20">
+            <div class="question-title">20. Conteo de Valores Únicos <span class="points">2 Puntos</span></div>
+            <div class="question-description">Cuenta cuántas veces aparece cada valor único en la columna 'Categoria'.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+data = {'Categoria': ['A', 'B', 'A', 'C', 'B', 'A']}
+df = pd.DataFrame(data)
+conteo = df['Categoria'].<span class="code-placeholder" id="q20-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para contar valores únicos</span>
+print(conteo)</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(20)">Verificar Respuesta</button>
+            <div id="q20-feedback" class="feedback-area"></div>
+        </div>
+
+        <h3 style="color: #2980b9; margin-top:40px;">Generación de Gráficos</h3>
+
+        <div class="question" id="q21">
+            <div class="question-title">21. Gráfico de Líneas desde Serie <span class="points">2 Puntos</span></div>
+            <div class="question-description">Genera un gráfico de líneas simple directamente desde la Serie `mi_serie`.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+import matplotlib.pyplot as plt # Necesario para .show()
+mi_serie = pd.Series([5, 8, 6, 10, 7])
+mi_serie.<span class="code-placeholder" id="q21-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para generar un gráfico</span>
+plt.show() # Muestra el gráfico</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(21)">Verificar Respuesta</button>
+            <div id="q21-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q22">
+            <div class="question-title">22. Gráfico de Líneas desde DataFrame <span class="points">2 Puntos</span></div>
+            <div class="question-description">Genera un gráfico de líneas usando el índice como eje X y cada columna numérica como una línea separada.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+import matplotlib.pyplot as plt
+data = {'Serie1': [10, 12, 15], 'Serie2': [8, 9, 7]}
+df = pd.DataFrame(data, index=[2020, 2021, 2022])
+df.<span class="code-placeholder" id="q22-part1" contenteditable="true">[...]</span>() <span class="code-comment"># Rellena: Método para graficar el DataFrame</span>
+plt.show()</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(22)">Verificar Respuesta</button>
+            <div id="q22-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q23">
+            <div class="question-title">23. Gráfico de Barras <span class="points">3 Puntos</span></div>
+            <div class="question-description">Genera un gráfico de barras a partir del DataFrame `df`, usando el índice como categorías.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+import matplotlib.pyplot as plt
+data = {'Ventas': [150, 220, 180]}
+df = pd.DataFrame(data, index=['TiendaA', 'TiendaB', 'TiendaC'])
+df.<span class="code-placeholder" id="q23-part1" contenteditable="true">[...]</span>(kind='bar') <span class="code-comment"># Rellena: Método plot especificando tipo 'bar'</span>
+plt.ylabel('Ventas')
+plt.show()</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(23)">Verificar Respuesta</button>
+            <div id="q23-feedback" class="feedback-area"></div>
+        </div>
+
+        <div class="question" id="q24">
+            <div class="question-title">24. Histograma de una Columna <span class="points">3 Puntos</span></div>
+            <div class="question-description">Genera un histograma para visualizar la distribución de los valores en la columna 'Edad'.</div>
+            <div class="code-container">
+                <pre>import pandas as pd
+import matplotlib.pyplot as plt
+data = {'Edad': [22, 25, 30, 25, 40, 35, 30, 28, 22, 50]}
+df = pd.DataFrame(data)
+df['Edad'].<span class="code-placeholder" id="q24-part1" contenteditable="true">[...]</span>(kind='hist', bins=5) <span class="code-comment"># Rellena: Método plot especificando tipo 'hist'</span>
+plt.xlabel('Edad')
+plt.show()</pre>
+            </div>
+            <button class="feedback-btn" onclick="checkAnswer(24)">Verificar Respuesta</button>
+            <div id="q24-feedback" class="feedback-area"></div>
+        </div>
+
+    </div>
+
+    <button id="calculate-btn" onclick="calculateFinalGrade()">Calcular Nota Final</button>
+
+    <div class="results" id="results">
+        <h2>Resultados de la Evaluación</h2>
+        <div id="results-details"></div>
+        <div class="score-display" id="score-display"></div>
+    </div>
+
+    <script>
+        // Respuestas correctas para cada pregunta
+        const correctAnswers = {
+            // Fundamentos DataFrame (6)
+            q1: ["import", "as"],
+            q2: ["Series"],
+            q3: ["DataFrame"],
+            q4: ["shape"],
+            q5: ["columns"],
+            q6: ["dtypes"],
+            // Índice (6)
+            q7: ["index"],
+            q8: ["set_index"],
+            q9: ["reset_index"],
+            q10: ["loc"],
+            q11: ["iloc"],
+            q12: ["reindex"],
+            // Operaciones (8)
+            q13: ["['Precio']"], // Aceptar comillas simples o dobles
+            q14: ["*"],
+            q15: ["sum"],
+            q16: ["mean"],
+            q17: ["max"],
+            q18: ["describe"],
+            q19: ["apply"],
+            q20: ["value_counts"],
+            // Graficación (4)
+            q21: ["plot"],
+            q22: ["plot"],
+            q23: ["plot"],
+            q24: ["plot"]
+        };
+
+        // Valores de puntos para cada pregunta (total 50 puntos)
+        const pointValues = {
+             // Fundamentos DataFrame (12 pts)
+            q1: 2, q2: 2, q3: 2, q4: 2, q5: 2, q6: 2,
+            // Índice (12 pts)
+            q7: 2, q8: 2, q9: 2, q10: 2, q11: 2, q12: 2,
+            // Operaciones (16 pts)
+            q13: 2, q14: 2, q15: 2, q16: 2, q17: 2, q18: 2, q19: 2, q20: 2,
+            // Graficación (10 pts)
+            q21: 2, q22: 2, q23: 3, // Bar plot
+            q24: 3  // Histograma
+        }; // Suma: 22 * 2 + 2 * 3 = 44 + 6 = 50 puntos
+
+        // Objeto para almacenar los resultados y estado de verificación
+        const results = {};
+        const verified = {};
+
+        // Función para verificar una respuesta individual
+        function checkAnswer(questionNumber) {
+            const questionId = `q${questionNumber}`;
+            const feedbackDiv = document.getElementById(`${questionId}-feedback`);
+            feedbackDiv.innerHTML = "";
+
+            let allCorrect = true;
+            let correctCount = 0;
+            const correctAnswersList = correctAnswers[questionId];
+            const totalParts = correctAnswersList.length;
+
+            for (let i = 1; i <= totalParts; i++) {
+                const partId = `${questionId}-part${i}`;
+                const placeholder = document.getElementById(partId);
+                 if (!placeholder) {
+                    console.error(`Placeholder ${partId} no encontrado.`);
+                    continue;
+                }
+                const userAnswer = placeholder.textContent.trim();
+                let correctAnswer = correctAnswersList[i-1];
+
+                placeholder.classList.remove("correct", "incorrect");
+
+                // Normalizar respuestas
+                let normalizedUserAnswer = userAnswer;
+                let normalizedCorrectAnswer = correctAnswer;
+
+                // Caso especial para selección de columnas (permitir ' o ")
+                if (questionId === 'q13') {
+                    normalizedUserAnswer = userAnswer.replace(/'/g, '"');
+                    normalizedCorrectAnswer = correctAnswer.replace(/'/g, '"');
+                }
+
+                if (normalizedUserAnswer === normalizedCorrectAnswer) {
+                    placeholder.classList.add("correct");
+                    correctCount++;
+                } else {
+                    placeholder.classList.add("incorrect");
+                    allCorrect = false;
+                }
+            }
+
+            const questionScore = totalParts > 0 ? (correctCount / totalParts) * pointValues[questionId] : (allCorrect ? pointValues[questionId] : 0);
+            results[questionId] = questionScore;
+            verified[questionId] = true;
+
+             // Mostrar retroalimentación con colores
+             if (allCorrect) {
+                feedbackDiv.innerHTML = `<span class="correct">¡Correcto! (+${pointValues[questionId]} puntos)</span>`;
+                feedbackDiv.style.backgroundColor = '#c8e6c9'; // Verde muy pálido
+            } else if (correctCount > 0) {
+                feedbackDiv.innerHTML = `<span class="incorrect">Parcialmente correcto (${correctCount}/${totalParts} partes correctas. +${questionScore.toFixed(1)} puntos)</span>`;
+                feedbackDiv.style.backgroundColor = '#fff9c4'; // Amarillo muy pálido
+            } else {
+                feedbackDiv.innerHTML = `<span class="incorrect">Incorrecto. Revisa la sintaxis o el concepto. (+0 puntos)</span>`;
+                feedbackDiv.style.backgroundColor = '#ffcdd2'; // Rojo muy pálido
+            }
+
+
+            updateProgressBar();
+        }
+
+        // Función para calcular la nota final (sin cambios)
+        function calculateFinalGrade() {
+            let totalScore = 0;
+            let resultsHTML = "";
+            let totalPossible = 0;
+            const totalQuestions = Object.keys(pointValues).length;
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                const questionId = `q${i}`;
+                 if (!verified[questionId]) {
+                    checkAnswer(i);
+                }
+                totalPossible += pointValues[questionId];
+                const questionScore = results[questionId] || 0;
+                totalScore += questionScore;
+
+                resultsHTML += `<div class="question-result"><strong>Pregunta ${i}:</strong> `;
+                resultsHTML += `${questionScore.toFixed(1)} / ${pointValues[questionId]} puntos</div>`;
+            }
+
+            document.getElementById('results-details').innerHTML = resultsHTML;
+
+            const percentage = totalPossible > 0 ? (totalScore / totalPossible) * 100 : 0;
+            let gradeMessage = "";
+
+             if (percentage >= 90) gradeMessage = "¡Excelente comprensión de los fundamentos de Pandas!";
+            else if (percentage >= 80) gradeMessage = "¡Muy buen trabajo con los conceptos básicos!";
+            else if (percentage >= 70) gradeMessage = "Buen manejo de DataFrame e Índice";
+            else if (percentage >= 60) gradeMessage = "Aprobado, ¡repasa algunos detalles!";
+            else gradeMessage = "Necesitas reforzar los conceptos fundamentales de Pandas";
+
+            const nombre = document.getElementById('nombre').value || "Estudiante";
+            const apellidos = document.getElementById('apellidos').value || "";
+            const fullName = `${nombre} ${apellidos}`.trim();
+
+            document.getElementById('score-display').innerHTML = `
+                <strong>${fullName}</strong><br>
+                ${gradeMessage}<br>
+                Puntaje Total: ${totalScore.toFixed(1)} / ${totalPossible} puntos<br>
+                Porcentaje: ${percentage.toFixed(1)}%
+            `;
+
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Función para actualizar la barra de progreso (sin cambios)
+        function updateProgressBar() {
+            const totalQuestions = Object.keys(pointValues).length;
+            const verifiedCount = Object.keys(verified).length;
+            const progressPercentage = totalQuestions > 0 ? (verifiedCount / totalQuestions) * 100 : 0;
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${progressPercentage}%`;
+            progressBar.textContent = `${Math.round(progressPercentage)}% Verificado`;
+        }
+
+        // Hacer que los placeholders sean editables (sin cambios)
+        document.querySelectorAll('.code-placeholder').forEach(placeholder => {
+            placeholder.dataset.placeholder = '[...]';
+            placeholder.addEventListener('focus', function() {
+                if (this.textContent === this.dataset.placeholder) {
+                    this.textContent = "";
+                }
+                this.style.minWidth = '40px';
+            });
+            placeholder.addEventListener('blur', function() {
+                if (this.textContent.trim() === "") {
+                    this.textContent = this.dataset.placeholder;
+                }
+                 this.style.minWidth = '20px';
+            });
+             if (placeholder.textContent.trim() === '') {
+                placeholder.textContent = placeholder.dataset.placeholder;
+            }
+        });
+
+        // Inicializar barra de progreso al cargar
+        updateProgressBar();
+
+    </script>
+</body>
+</html>
